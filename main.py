@@ -31,11 +31,9 @@ async def remove_vocals(file: UploadFile = File(...)):
     
     try:
         # 2. Demucs CLI ကို RAM စားသက်သာစေရန် Options များနှင့် ခေါ်ယူခြင်း
-        # --segment 1 (သို့မဟုတ် 2) က RAM အများကြီးစားခြင်းကို ကာကွယ်ပေးသည်
-        # --shifts 0 က processing အမြန်နှုန်းကို ပိုကောင်းစေသည်
         cmd = [
             "demucs",
-            "-n", "htdemucs_s",  # htdemucs အစား ပိုပေါ့ပါးသော htdemucs_s (smaller model) ကို သုံးခြင်း
+            "-n", "htdemucs",
             "--two-stems", "vocals",
             "--segment", "2",
             "--shifts", "0",
@@ -48,9 +46,9 @@ async def remove_vocals(file: UploadFile = File(...)):
         if result.returncode != 0:
             raise HTTPException(status_code=500, detail=f"Demucs Error: {result.stderr}")
         
-        # 3. ထွက်လာသော Instrumental ဖိုင် လမ်းကြောင်းကို ရှာခြင်း (htdemucs_s အတွက် folder နာမည် ပြောင်းလဲမှုကို ထည့်သွင်းခြင်း)
+        # 3. ထွက်လာသော Instrumental ဖိုင် လမ်းကြောင်းကို ရှာခြင်း
         filename_without_ext = os.path.splitext(file.filename)[0]
-        instrumental_path = os.path.join(output_dir, "htdemucs_s", filename_without_ext, "no_vocals.wav")
+        instrumental_path = os.path.join(output_dir, "htdemucs", filename_without_ext, "no_vocals.wav")
         
         if not os.path.exists(instrumental_path):
             raise HTTPException(status_code=500, detail="Instrumental file output not found.")
